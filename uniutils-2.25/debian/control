@@ -1,0 +1,39 @@
+Source: uniutils
+Section: misc
+Priority: optional
+Maintainer: Mohammed Sameer <msameer@debian.org>
+Build-Depends: debhelper (>= 5.0.0)
+Standards-Version: 3.7.2
+
+Package: unidesc
+Depends: uniutils
+Architecture: any
+Description: Tools for finding out what is in a Unicode file (dummy package)
+ This is a dummy package to facilitate the upgrade.
+
+Package: uniutils
+Provides: unidesc
+Replaces: unidesc
+Conflicts: unidesc (<< 2.22-1)
+Architecture: any
+Depends: ${shlibs:Depends}, ascii2binary
+Description: Tools for finding out what is in a Unicode file
+ Useful tools when working with Unicode files when one doesn't know
+ the writing system, doesn't have the necessary font, needs to inspect
+ invisible characters, needs to find out whether characters have been
+ combined or in what order they occur, or needs statistics on which
+ characters occur.
+ .
+  * uniname defaults to printing the character offset of each character,
+    its byte offset, its hex code value, its encoding, the glyph itself,
+    and its name. It may also be used to validate UTF-8 input.
+  * unidesc reports the character ranges to which different portions of the
+    text belong. It can also be used to identify Unicode encodings
+    (e.g. UTF-16be) flagged by magic numbers.
+  * unihist generates a histogram of the characters in its input.
+  * ExplicateUTF8 is intended for debugging or for learning about Unicode.
+    It determines and explains the validity of a sequence of bytes as a UTF8
+    encoding.
+  * utf8lookup provides a handy way to look up Unicode characters from the
+    command line.
+  * unirev reverse each line of UTF-8 input character-by-character.

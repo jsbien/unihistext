@@ -1,0 +1,51 @@
+uniutils (2.25-3) unstable; urgency=low
+
+  * debian/rules: use [ ! -f Makefile ] || $(MAKE) distclean instead of -$(MAKE) distclean
+
+ -- Mohammed Sameer <msameer@debian.org>  Wed, 25 Jul 2007 02:51:33 +0300
+
+uniutils (2.25-2) unstable; urgency=low
+
+  * Add unidesc as a dummy package that depends on uniutils.
+
+ -- Mohammed Sameer <msameer@debian.org>  Wed, 25 Jul 2007 01:47:29 +0300
+
+uniutils (2.25-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: use the debian.org email in the Maintainer field
+
+ -- Mohammed Sameer <msameer@debian.org>  Fri, 13 Jul 2007 12:26:18 +0300
+
+uniutils (2.24-1) unstable; urgency=low
+
+  * New upstream release.
+  * Renamed the package from unidesc to uniutils.
+  * Added unirev to the description.
+
+ -- Mohammed Sameer <debian@foolab.org>  Sun, 17 Jun 2007 22:59:36 +0300
+
+unidesc (2.22-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/compat: Bumped to 5
+  * debian/changelog
+  * Depends on debhelper 5.0.0
+
+ -- Mohammed Sameer <debian@foolab.org>  Wed, 11 Oct 2006 04:24:01 +0200
+
+unidesc (2.17-2) unstable; urgency=low
+
+  * debian/control:
+    - Drop Build-Depends on autotools-dev
+    - Better description.
+  * debian/rules: Cleaned up a bit.
+
+ -- Mohammed Sameer <debian@foolab.org>  Wed,  2 Aug 2006 00:25:31 +0300
+
+unidesc (2.17-1) unstable; urgency=low
+
+  * Initial release (Closes: #337498)
+
+ -- Mohammed Sameer <debian@foolab.org>  Sat,  3 Jun 2006 19:00:54 +0300
+
