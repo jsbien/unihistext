@@ -1,0 +1,18 @@
+
+Combining Character:
+    with the General Category of Combining Mark (M)
+    definition D52 in http://www.unicode.org/versions/Unicode5.0.0/ch03.pdf#G30602
+
+Combining Character Sequence
+    (base character followed)? by 1+ of combining character, ZERO WIDTH JOINER, or ZERO WIDTH NON-JOINER
+    ZERO WIDTH NON-JOINER is 200c
+    ZERO WIDTH JOINER is 200d
+
+    Combining Diacritical Marks (http://en.wikipedia.org/wiki/Combining_diacritical_mark and unicode.org PDFs referenced there)
+	0300 - 036f
+    Combining Diacritical Marks Supplement
+	1dc0 - 1dff
+    Combining Diacritical Marks for Symbols
+	20d0 - 20ff
+    Combining Half Marks
+	fe20 - fe2f
