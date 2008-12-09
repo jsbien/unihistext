@@ -47,7 +47,7 @@ def run(options, args):
     print "Supported Unicode version: " + unicodedata.unidata_version
 
     for line in unicode_xreadlines(sys.stdin):
-        
+
         i = 0
         while i != len(line):
             off = i
