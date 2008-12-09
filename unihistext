@@ -2,6 +2,7 @@
 
 import sys, os, os.path
 import unicodedata
+from itertools import imap
 import codecs
 
 def unicode_xreadlines(input, encoding = 'utf-8'):
@@ -15,11 +16,18 @@ def main():
     parser.add_option("--encoding", help="set input stream binary encoding ('utf-8' is the default)", default='utf-8')
     parser.add_option("-l", "--list-encodings", help="list some available encodings and exit", default=False, action="store_true")
     parser.add_option("-v", "--version", help="print version and exit", default=False, action="store_true")
+    parser.add_option("-c", "--combining", help="recognize combining character sequences", default=False, action="store_true")
 
     run(*parser.parse_args())
 
 def list_encodings():
-    encs = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006', 'cp1026', 'cp1140', 'cp1250', 'cp1251', 'cp1252', 'cp1253', 'cp1254', 'cp1255', 'cp1256', 'cp1257', 'cp1258', 'cp424', 'cp437', 'cp500', 'cp737', 'cp775', 'cp850', 'cp852', 'cp855', 'cp856', 'cp857', 'cp860', 'cp861', 'cp862', 'cp863', 'cp864', 'cp865', 'cp866', 'cp869', 'cp874', 'cp875', 'cp932', 'cp949', 'cp950', 'euc_jis_2004', 'euc_jisx0213', 'euc_jp', 'euc_kr', 'gb18030', 'gb2312', 'gbk', 'hz', 'iso2022_jp', 'iso2022_jp_1', 'iso2022_jp_2', 'iso2022_jp_2004', 'iso2022_jp_3', 'iso2022_jp_ext', 'iso2022_kr', 'iso8859_10', 'iso8859_13', 'iso8859_14', 'iso8859_15', 'iso8859_2', 'iso8859_3', 'iso8859_4', 'iso8859_5', 'iso8859_6', 'iso8859_7', 'iso8859_8', 'iso8859_9', 'johab', 'koi8_r', 'koi8_u', 'latin_1', 'mac_cyrillic', 'mac_greek', 'mac_iceland', 'mac_latin2', 'mac_roman', 'mac_turkish', 'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213', 'utf_16', 'utf_16_be', 'utf_16_le', 'utf_7', 'utf_8']
+    encs = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006', 'cp1026', 'cp1140', 'cp1250', 'cp1251', 'cp1252', 'cp1253', 'cp1254', 'cp1255', 'cp1256', 'cp1257',
+            'cp1258', 'cp424', 'cp437', 'cp500', 'cp737', 'cp775', 'cp850', 'cp852', 'cp855', 'cp856', 'cp857', 'cp860', 'cp861', 'cp862', 'cp863', 'cp864',
+            'cp865', 'cp866', 'cp869', 'cp874', 'cp875', 'cp932', 'cp949', 'cp950', 'euc_jis_2004', 'euc_jisx0213', 'euc_jp', 'euc_kr', 'gb18030', 'gb2312',
+            'gbk', 'hz', 'iso2022_jp', 'iso2022_jp_1', 'iso2022_jp_2', 'iso2022_jp_2004', 'iso2022_jp_3', 'iso2022_jp_ext', 'iso2022_kr', 'iso8859_10',
+            'iso8859_13', 'iso8859_14', 'iso8859_15', 'iso8859_2', 'iso8859_3', 'iso8859_4', 'iso8859_5', 'iso8859_6', 'iso8859_7', 'iso8859_8', 'iso8859_9',
+            'johab', 'koi8_r', 'koi8_u', 'latin_1', 'mac_cyrillic', 'mac_greek', 'mac_iceland', 'mac_latin2', 'mac_roman', 'mac_turkish', 'ptcp154',
+            'shift_jis', 'shift_jis_2004', 'shift_jisx0213', 'utf_16', 'utf_16_be', 'utf_16_le', 'utf_7', 'utf_8']
     maxlen = max(len(e) + 2 for e in encs)
     termcols = 80
     cols = termcols / maxlen
@@ -37,32 +45,99 @@ def list_encodings():
 
 def print_version():
     print os.path.basename(sys.argv[0]) + " v0.1"
-
-def is_combining(unichr, more_combinings = (unicodedata.lookup('zero width joiner'), unicodedata.lookup('zero width non-joiner'))):
-    return unichr in more_combinings or unicodedata.category(unichr)[0] == 'M'
-
-def run(options, args):
-    if options.version:
-        return print_version()
-    if options.list_encodings:
-        return list_encodings()
-
     print "Supported Unicode version: " + unicodedata.unidata_version
 
-    for line in unicode_xreadlines(sys.stdin):
+def is_combining(unichr, more_combinings = (unicodedata.lookup('zero width joiner'), unicodedata.lookup('zero width non-joiner'))):
+    return unichr in more_combinings or unicodedata.combining(unichr) != 0
+
+def is_base(unichr):
+    if is_combining(unichr): return False
+    if unicodedata.category(unichr) in ('Cc', 'Cf'): return False
+    return True
+
+def glue_combinings(unichr, line, i):
+    if is_base(unichr) or is_combining(unichr):
+        while i != len(line) and is_combining(line[i]):
+            unichr += line[i]
+            i += 1
+    return unichr, line, i
+
+def make_stats(input, options, args):
+    glue_combinings_ = lambda *args: args
+    if options.combining: glue_combinings_ = glue_combinings
+
+    stats = {}
+    for line in unicode_xreadlines(input):
 
         i = 0
         while i != len(line):
             off = i
             unichr = line[i]
             i += 1
+            unichr, line, i = glue_combinings_(unichr, line, i)
+            # TODO any other glues?
+            stats[unichr] = stats.get(unichr, 0) + 1
+    return stats
 
-            # glue with next unichr if it's a Combining Character
-            while i != len(line) and is_combining(line[i]):
-                unichr += line[i]
-                i += 1
+# output formatting
+class Formatter(object):
+    @staticmethod
+    def fmt(d, totals):
+        raise NotImplementedError
+    @staticmethod
+    def stat(d, totals):
+        pass
+    @staticmethod
+    def prep(d, totals):
+        pass
 
-            print off, unichr, repr(unichr)
+class SimpleFmt(Formatter):
+    @staticmethod
+    def fmt(d, totals):
+        return "        %7.3f %8d" % (d['count'] * 100.0 / totals['total_count'], d['count'])
+
+class HexFmt(Formatter):
+    @staticmethod
+    def fmt(d, totals):
+        return "        %*s" % (totals['max_hexs_len'], d['hexs'])
+    @staticmethod
+    def prep(d, totals):
+        d['hexs'] = " ".join([ "0x%.6X" % ord(unichr) for unichr in d['unistr'] ]) # convert unistr to HEXes
+    @staticmethod
+    def stat(stats, totals):
+        totals['max_hexs_len'] = max(len(d['hexs']) for d in stats)
+
+class UnistrFmt(Formatter):
+    @staticmethod
+    def fmt(d, totals):
+        return "        '%s'" % d['unistr']
+
+def print_hist(input, options, args):
+    stats = make_stats(input, options, args)
+    stats = list(stats.iteritems())
+    second = lambda t: t[1]
+    stats.sort(key = second) # sort by occurrances
+    totals = {}
+    totals['total_count'] = sum(imap(second, stats))
+    stats = [ {'unistr': unistr, 'count': count } for (unistr, count) in stats ] # convert each entry to dict
+
+    # TODO construct fmts accoring to options
+    fmts = (SimpleFmt(), HexFmt(), UnistrFmt())
+
+    for fmt in fmts:
+        for d in stats:
+            fmt.prep(d, totals)
+        fmt.stat(stats, totals)
+
+    for d in stats:
+        print "".join(fmt.fmt(d, totals) for fmt in fmts)
+
+def run(options, args):
+    if options.version:
+        return print_version()
+    if options.list_encodings:
+        return list_encodings()
+    return print_hist(sys.stdin, options, args)
 
 if __name__ == "__main__":
     main()
