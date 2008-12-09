@@ -38,6 +38,9 @@ def list_encodings():
 def print_version():
     print os.path.basename(sys.argv[0]) + " v0.1"
 
+def is_combining(unichr, more_combinings = (unicodedata.lookup('zero width joiner'), unicodedata.lookup('zero width non-joiner'))):
+    return unichr in more_combinings or unicodedata.category(unichr)[0] == 'M'
+
 def run(options, args):
     if options.version:
         return print_version()
@@ -55,8 +58,7 @@ def run(options, args):
             i += 1
 
             # glue with next unichr if it's a Combining Character
-            # TODO support zero width joiner, or zero width non-joiner
-            while i != len(line) and unicodedata.category(line[i])[0] == 'M':
+            while i != len(line) and is_combining(line[i]):
                 unichr += line[i]
                 i += 1
 
