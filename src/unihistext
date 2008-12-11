@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-# license: GPL v2 or v3
-
 __author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
-
 
 import sys, os, os.path
 import unicodedata
