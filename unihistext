@@ -17,6 +17,10 @@ def main():
     parser.add_option("-l", "--list-encodings", help="list some available encodings and exit", default=False, action="store_true")
     parser.add_option("-v", "--version", help="print version and exit", default=False, action="store_true")
     parser.add_option("-c", "--combining", help="recognize combining character sequences", default=False, action="store_true")
+    parser.add_option("-n", "--names", help="print names of Unicode characters or sequences", default=False, action="store_true")
+    parser.add_option("-S", "--sequence-names-file", help="use file in format of NamedSequences.txt from Unicode instead of system default",
+            default="/usr/share/unicode/NamedSequences.txt", metavar="FILE")
+    parser.add_option("--only-combining", help="print only combining character sequences", default=False, action="store_true")
 
     run(*parser.parse_args())
 
@@ -52,7 +56,7 @@ def is_combining(unichr, more_combinings = (unicodedata.lookup('zero width joine
 
 def is_base(unichr):
     if is_combining(unichr): return False
-    if unicodedata.category(unichr) in ('Cc', 'Cf'): return False
+    if unicodedata.category(unichr) in ('Cc', 'Cf', 'Zs', 'Zl', 'Zp'): return False
     return True
 
 def glue_combinings(unichr, line, i):
@@ -96,8 +100,11 @@ class Formatter(object):
 
 class SimpleFmt(Formatter):
     @staticmethod
+    def stat(stats, totals):
+        totals['total_count'] = sum(d['count'] for d in stats)
+    @staticmethod
     def fmt(d, totals):
-        return "        %7.3f %8d" % (d['count'] * 100.0 / totals['total_count'], d['count'])
+        return "%8.3f %8d" % (d['count'] * 100.0 / totals['total_count'], d['count'])
 
 class HexFmt(Formatter):
     @staticmethod
@@ -115,11 +122,27 @@ class UnistrFmt(Formatter):
     def fmt(d, totals):
         f = "  \t%s\t"
         for unichr in d['unistr']:
-            if unicodedata.category(unichr) in ('Cc', 'Cf'):
+            if unicodedata.category(unichr) in ('Cc', 'Cf', 'Zl', 'Zp'):
                 return f % ""
         return f % d['unistr']
 
 class NameFmt(Formatter):
+    mapping = {}
+    def __init__(self, named_sequences_file = None):
+        if named_sequences_file is not None:
+            self.mapping = {}
+            for line in open(named_sequences_file).xreadlines():
+                try:
+                    line = line.strip()
+                    if not line or line[0] == '#': continue
+                    name, codes = line.split(";")
+                    unistr = u"".join(unichr(int(codepoint, 16)) for codepoint in codes.split())
+                    self.mapping[unistr] = name
+                except Exception:
+                    import traceback
+                    traceback.print_exc()
+                    pass
+
     def _name(self, unichr):
         try:
             return unicodedata.name(unichr)
@@ -127,7 +150,12 @@ class NameFmt(Formatter):
             return ""
 
     def prep(self, d, totals):
-        d['name'] = ", ".join(map(self._name, d['unistr']))
+        if d['unistr'] in self.mapping:
+            d['name'] = self.mapping[d['unistr']]
+            return
+        d['name'] = ", ".join(filter(None, map(self._name, d['unistr'])))
+        if self.options.combining and not is_base(d['unistr'][0]) and is_combining(d['unistr']):
+            d['name'] = "<no base> " + d['name']
     @staticmethod
     def stat(stats, totals):
         totals['max_name_len'] = max(len(d['name']) for d in stats)
@@ -135,30 +163,45 @@ class NameFmt(Formatter):
     def fmt(d, totals):
         return "%-*s" % (totals['max_name_len'] + 3, d['name'])
 
+class OnlyCombiningFilter(Formatter):
+    def filter(self, d, totals):
+        for unichr in d['unistr']:
+            if is_combining(unichr): return True
+        return False
+
 def print_hist(input, options, args):
     stats = make_stats(input, options, args)
     stats = list(stats.iteritems())
     second = lambda t: t[1]
-    stats.sort(key = second) # sort by occurrances
+    stats.sort(key = second, reverse=True) # sort by occurrances
     totals = {}
-    totals['total_count'] = sum(imap(second, stats))
     stats = [ {'unistr': unistr, 'count': count } for (unistr, count) in stats ] # convert each entry to dict
 
     # TODO construct fmts accoring to options
-    fmts = (SimpleFmt(), HexFmt(), UnistrFmt(), NameFmt())
+    fmts = [SimpleFmt(), HexFmt(), UnistrFmt()]
 
+    if options.names:
+        fmts.append(NameFmt(options.sequence_names_file))
+
+    if options.only_combining:
+        fmts.append(OnlyCombiningFilter())
+
+    for fmt in fmts:
+        fmt.options = options
+        fmt.args = args
+
+    # apply filtering
+    for fmt in fmts:
+        stats = ( d for d in stats if fmt.filter(d, totals) )
+
+    stats = list(stats)
     for fmt in fmts:
         for d in stats:
             fmt.prep(d, totals)
         fmt.stat(stats, totals)
 
-    # apply filtering
-    for fmt in fmts:
-        stats = ( d for d in stats if fmt.filter(d, totals) )
-    stats = list(stats)
-
     for d in stats:
-        print "".join(fmt.fmt(d, totals) for fmt in fmts)
+        print "".join(fmt.fmt(d, totals) for fmt in fmts).rstrip()
 
 def run(options, args):
     if options.version:
