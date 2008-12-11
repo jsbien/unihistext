@@ -83,13 +83,16 @@ def make_stats(input, options, args):
 class Formatter(object):
     @staticmethod
     def fmt(d, totals):
-        raise NotImplementedError
+        return ""
     @staticmethod
     def stat(d, totals):
         pass
     @staticmethod
     def prep(d, totals):
         pass
+    @staticmethod
+    def filter(d, totals):
+        return True
 
 class SimpleFmt(Formatter):
     @staticmethod
@@ -110,7 +113,27 @@ class HexFmt(Formatter):
 class UnistrFmt(Formatter):
     @staticmethod
     def fmt(d, totals):
-        return "        '%s'" % d['unistr']
+        f = "  \t%s\t"
+        for unichr in d['unistr']:
+            if unicodedata.category(unichr) in ('Cc', 'Cf'):
+                return f % ""
+        return f % d['unistr']
+
+class NameFmt(Formatter):
+    def _name(self, unichr):
+        try:
+            return unicodedata.name(unichr)
+        except ValueError:
+            return ""
+
+    def prep(self, d, totals):
+        d['name'] = ", ".join(map(self._name, d['unistr']))
+    @staticmethod
+    def stat(stats, totals):
+        totals['max_name_len'] = max(len(d['name']) for d in stats)
+    @staticmethod
+    def fmt(d, totals):
+        return "%-*s" % (totals['max_name_len'] + 3, d['name'])
 
 def print_hist(input, options, args):
     stats = make_stats(input, options, args)
@@ -122,12 +145,17 @@ def print_hist(input, options, args):
     stats = [ {'unistr': unistr, 'count': count } for (unistr, count) in stats ] # convert each entry to dict
 
     # TODO construct fmts accoring to options
-    fmts = (SimpleFmt(), HexFmt(), UnistrFmt())
+    fmts = (SimpleFmt(), HexFmt(), UnistrFmt(), NameFmt())
 
     for fmt in fmts:
         for d in stats:
             fmt.prep(d, totals)
         fmt.stat(stats, totals)
+
+    # apply filtering
+    for fmt in fmts:
+        stats = ( d for d in stats if fmt.filter(d, totals) )
+    stats = list(stats)
 
     for d in stats:
         print "".join(fmt.fmt(d, totals) for fmt in fmts)
