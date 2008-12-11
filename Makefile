@@ -3,9 +3,9 @@ all::
 
 all:: build/unihistext
 
-build/unihistext: src/unihistext src/make-wrapper.sh src/gzip-wrapper.sh src/version.py
+build/unihistext: src/unihistext src/make-wrapper.sh src/gzip-wrapper.sh src/version.py src/unihistimpl.py
 	mkdir -p `dirname $@`
-	{ cd src && ./make-wrapper.sh unihistext version.py; } > $@
+	{ cd src && ./make-wrapper.sh unihistext version.py unihistimpl.py; } > $@
 	chmod +x $@
 
 src/version.py:
