@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+__author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
+
 import sys, os, os.path
 import unicodedata
 from itertools import imap
