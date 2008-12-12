@@ -112,7 +112,7 @@ class HexFmt(Formatter):
         d['hexs'] = " ".join([ "0x%.6X" % ord(unichr) for unichr in d['unistr'] ]) # convert unistr to HEXes
     @staticmethod
     def stat(stats, totals):
-        totals['max_hexs_len'] = max(len(d['hexs']) for d in stats)
+        totals['max_hexs_len'] = safe_max(len(d['hexs']) for d in stats, 0)
 
 class UnistrFmt(Formatter):
     @staticmethod
@@ -155,7 +155,7 @@ class NameFmt(Formatter):
             d['name'] = "<no base> " + d['name']
     @staticmethod
     def stat(stats, totals):
-        totals['max_name_len'] = max(len(d['name']) for d in stats)
+        totals['max_name_len'] = safe_max(len(d['name']) for d in stats, 0)
     @staticmethod
     def fmt(d, totals):
         return "%-*s" % (totals['max_name_len'] + 3, d['name'])

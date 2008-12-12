@@ -27,3 +27,15 @@ def open_input(options, **kwargs):
 def die(fmt, *args):
     print >> sys.stderr, fmt % args
     sys.exit(1)
+
+def _safe_op(op, collection, fallback):
+    try:
+        return op(collection)
+    except ValueError:
+        return fallback
+
+def safe_max(collection, fallback = 0):
+    return _safe_op(max, collection, fallback)
+
+def safe_min(collection, fallback = int(2 ** 31 - 1)):
+    return _safe_op(min, collection, fallback)
