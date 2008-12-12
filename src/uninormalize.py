@@ -8,6 +8,7 @@ from itertools import imap
 import codecs
 from helpers import *
 
+@make_main
 def main():
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] [[-n] NORM]")

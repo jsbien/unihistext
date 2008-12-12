@@ -1,5 +1,6 @@
 
-import os, sys, unicodedata, codecs
+import os, sys, unicodedata, codecs, signal
+from functools import wraps
 import version
 
 def print_version():
@@ -39,3 +40,12 @@ def safe_max(collection, fallback = 0):
 
 def safe_min(collection, fallback = int(2 ** 31 - 1)):
     return _safe_op(min, collection, fallback)
+
+def make_main(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except KeyboardInterrupt:
+            sys.exit(128 + signal.SIGINT)
+    return wrapper
