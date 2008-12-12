@@ -6,7 +6,7 @@ import sys, os, os.path
 import unicodedata
 from itertools import imap
 import codecs
-from version import version
+from helpers import print_version
 
 def unicode_xreadlines(input, encoding = 'utf-8'):
     return codecs.iterdecode(input.xreadlines(), encoding=encoding)
@@ -49,10 +49,6 @@ def list_encodings():
     print "For a complete list of supported encodings"
     print "visit http://www.google.com/search?q=python+standard+encodings."
     print
-
-def print_version():
-    print os.path.basename(sys.argv[0]) + " version " + version
-    print "Supported Unicode version: " + unicodedata.unidata_version
 
 def is_combining(unichr, more_combinings = (unicodedata.lookup('zero width joiner'), unicodedata.lookup('zero width non-joiner'))):
     return unichr in more_combinings or unicodedata.combining(unichr) != 0

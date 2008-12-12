@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+__author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
+
+if __name__ == "__main__":
+    from uninormalize import main
+    main()
