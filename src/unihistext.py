@@ -13,7 +13,7 @@ def main():
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option("-i", "--input", dest="input", help="read Unicode stream from FILE ('-' means stdin, this is the default)", metavar="FILE", default="-")
-    parser.add_option("--encoding", help="set input stream binary encoding ('utf-8' is the default)", default='utf-8')
+    parser.add_option("-f", "--encoding", help="set input stream binary encoding ('utf-8' is the default)", default='utf-8')
     parser.add_option("-l", "--list-encodings", help="list some available encodings and exit", default=False, action="store_true")
     parser.add_option("-V", "--version", help="print version and exit", default=False, action="store_true")
     parser.add_option("-c", "--combining", help="recognize combining character sequences", default=False, action="store_true")
@@ -112,7 +112,7 @@ class HexFmt(Formatter):
         d['hexs'] = " ".join([ "0x%.6X" % ord(unichr) for unichr in d['unistr'] ]) # convert unistr to HEXes
     @staticmethod
     def stat(stats, totals):
-        totals['max_hexs_len'] = safe_max(len(d['hexs']) for d in stats, 0)
+        totals['max_hexs_len'] = safe_max(len(d['hexs']) for d in stats)
 
 class UnistrFmt(Formatter):
     @staticmethod
@@ -155,7 +155,7 @@ class NameFmt(Formatter):
             d['name'] = "<no base> " + d['name']
     @staticmethod
     def stat(stats, totals):
-        totals['max_name_len'] = safe_max(len(d['name']) for d in stats, 0)
+        totals['max_name_len'] = safe_max(len(d['name']) for d in stats)
     @staticmethod
     def fmt(d, totals):
         return "%-*s" % (totals['max_name_len'] + 3, d['name'])
