@@ -5,7 +5,7 @@ TMPVERSIONFILE := $(shell echo /tmp/.tmpverfile-`whoami`)
 all:: update_version
 
 
-ADDDEPS := src/make-wrapper.sh src/gzip-wrapper.sh src/version.py src/helpers.py
+ADDDEPS := src/version.py src/helpers.py
 
 build/unihistext: src/unihistext src/unihistext.py $(ADDDEPS)
 all:: build/unihistext
@@ -14,8 +14,7 @@ all:: build/uninormalize
 
 build/uninormalize build/unihistext:
 	mkdir -p `dirname $@`
-	#{ cd src && ./make-wrapper.sh unihistext ; } > $@
-	./src/make-wrapper.sh $^ > $@
+	./scripts/make-wrapper.sh $^ > $@
 	chmod +x $@
 
 update_version: $(TMPVERSIONFILE)
@@ -23,7 +22,7 @@ update_version: $(TMPVERSIONFILE)
 .PHONY: $(TMPVERSIONFILE)
 
 $(TMPVERSIONFILE) src/version.py:
-	{ echo "version = \"unknown\""; cd src && ./version-gen.sh | sed -e "s/^.*\$$/version = \"&\"/"; } > $@
+	{ echo "version = \"unknown\""; ./scripts/version-gen.sh | sed -e "s/^.*\$$/version = \"&\"/"; } > $@
 #.PHONY: src/version.py
 
 clean:

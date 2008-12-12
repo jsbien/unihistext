@@ -11,7 +11,7 @@ out="$tmp.out"
 csf="$tmp.csf"
 
 tar czvf "$tgz" "$program" "$@" >&2
-{ cat "$tgz" "$wrapper"; date; hostname; } > "$csf"
+{ cat "$tgz" "$wrapper"; } > "$csf"
 sha=`sha1sum "$csf" | awk '{print $1}'`
 
 cat "$wrapper" | \
