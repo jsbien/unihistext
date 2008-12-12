@@ -1,16 +1,30 @@
-
 all::
 
-all:: build/unihistext
+TMPVERSIONFILE := $(shell echo /tmp/.tmpverfile-`whoami`)
 
-build/unihistext: src/unihistext src/make-wrapper.sh src/gzip-wrapper.sh src/version.py src/unihistimpl.py
+all:: update_version
+
+
+ADDDEPS := src/make-wrapper.sh src/gzip-wrapper.sh src/version.py src/helpers.py
+
+build/unihistext: src/unihistext src/unihist.py $(ADDDEPS)
+all:: build/unihistext
+build/uninormalize: src/uninormalize src/uninormalize.py $(ADDDEPS)
+all:: build/uninormalize
+
+build/uninormalize build/unihistext:
 	mkdir -p `dirname $@`
-	{ cd src && ./make-wrapper.sh unihistext version.py unihistimpl.py; } > $@
+	#{ cd src && ./make-wrapper.sh unihistext ; } > $@
+	./src/make-wrapper.sh $^ > $@
 	chmod +x $@
 
-src/version.py:
+update_version: $(TMPVERSIONFILE)
+	cmp $(TMPVERSIONFILE) src/version.py -s || mv $(TMPVERSIONFILE) src/version.py
+.PHONY: $(TMPVERSIONFILE)
+
+$(TMPVERSIONFILE) src/version.py:
 	{ echo "version = \"unknown\""; cd src && ./version-gen.sh | sed -e "s/^.*\$$/version = \"&\"/"; } > $@
-.PHONY: src/version.py
+#.PHONY: src/version.py
 
 clean:
-	rm -rf build $(shell find -name '*~' | grep -v .git ) src/version.py
+	rm -rf build $(shell find -name '*~' -o -name '*.pyc' -o -name '*.pyo' | grep -v .git ) src/version.py $(TMPVERSIONFILE)
