@@ -7,7 +7,7 @@ all:: update_version
 
 ADDDEPS := src/make-wrapper.sh src/gzip-wrapper.sh src/version.py src/helpers.py
 
-build/unihistext: src/unihistext src/unihist.py $(ADDDEPS)
+build/unihistext: src/unihistext src/unihistext.py $(ADDDEPS)
 all:: build/unihistext
 build/uninormalize: src/uninormalize src/uninormalize.py $(ADDDEPS)
 all:: build/uninormalize

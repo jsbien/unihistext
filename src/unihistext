@@ -3,5 +3,5 @@
 __author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
 
 if __name__ == "__main__":
-    from unihistimpl import main
+    from unihistext import main
     main()

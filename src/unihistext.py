@@ -6,7 +6,7 @@ import sys, os, os.path
 import unicodedata
 from itertools import imap
 import codecs
-from helpers import print_version
+from helpers import * 
 
 def unicode_xreadlines(input, encoding = 'utf-8'):
     return codecs.iterdecode(input.xreadlines(), encoding=encoding)
@@ -26,6 +26,7 @@ def main():
     parser.add_option("--only-combining", help="print only combining character sequences", default=False, action="store_true")
 
     run(*parser.parse_args())
+    parser.destroy()
 
 def list_encodings():
     encs = ['ascii', 'big5', 'big5hkscs', 'cp037', 'cp1006', 'cp1026', 'cp1140', 'cp1250', 'cp1251', 'cp1252', 'cp1253', 'cp1254', 'cp1255', 'cp1256', 'cp1257',
@@ -207,7 +208,8 @@ def run(options, args):
         return print_version()
     if options.list_encodings:
         return list_encodings()
-    return print_hist(sys.stdin, options, args)
+    input = sys.stdin if options.input == "-" else open(options.input, 'rb')
+    return print_hist(input, options, args)
 
 if __name__ == "__main__":
     main()
