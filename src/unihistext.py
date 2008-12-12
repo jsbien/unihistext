@@ -8,9 +8,6 @@ from itertools import imap
 import codecs
 from helpers import * 
 
-def unicode_xreadlines(input, encoding = 'utf-8'):
-    return codecs.iterdecode(input.xreadlines(), encoding=encoding)
-
 def main():
 
     from optparse import OptionParser
@@ -18,7 +15,7 @@ def main():
     parser.add_option("-i", "--input", dest="input", help="read Unicode stream from FILE ('-' means stdin, this is the default)", metavar="FILE", default="-")
     parser.add_option("--encoding", help="set input stream binary encoding ('utf-8' is the default)", default='utf-8')
     parser.add_option("-l", "--list-encodings", help="list some available encodings and exit", default=False, action="store_true")
-    parser.add_option("-v", "--version", help="print version and exit", default=False, action="store_true")
+    parser.add_option("-V", "--version", help="print version and exit", default=False, action="store_true")
     parser.add_option("-c", "--combining", help="recognize combining character sequences", default=False, action="store_true")
     parser.add_option("-n", "--names", help="print names of Unicode characters or sequences", default=False, action="store_true")
     parser.add_option("-S", "--sequence-names-file", help="use file in format of NamedSequences.txt from Unicode instead of system default",
@@ -71,7 +68,7 @@ def make_stats(input, options, args):
     if options.combining: glue_combinings_ = glue_combinings
 
     stats = {}
-    for line in unicode_xreadlines(input):
+    for line in input:
 
         i = 0
         while i != len(line):
@@ -208,8 +205,7 @@ def run(options, args):
         return print_version()
     if options.list_encodings:
         return list_encodings()
-    input = sys.stdin if options.input == "-" else open(options.input, 'rb')
-    return print_hist(input, options, args)
+    return print_hist(open_input(options), options, args)
 
 if __name__ == "__main__":
     main()
