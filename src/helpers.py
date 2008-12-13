@@ -3,6 +3,8 @@ import os, sys, unicodedata, codecs, signal
 from functools import wraps
 import version
 
+def identity(x): return x
+
 def print_version():
     print os.path.basename(sys.argv[0]) + " version " + version.version
     print "Supported Unicode version: " + unicodedata.unidata_version
@@ -26,7 +28,7 @@ def open_input(options, **kwargs):
     return input
 
 def die(fmt, *args):
-    print >> sys.stderr, fmt % args
+    print >> sys.stderr, "%s:" % os.path.basename(sys.argv[0]), fmt % args
     sys.exit(1)
 
 def _safe_op(op, collection, fallback):
