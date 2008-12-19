@@ -7,7 +7,7 @@ all:: update_version
 
 ADDDEPS := src/version.py src/helpers.py
 
-build/unihistext: src/unihistext src/unihistext.py $(ADDDEPS)
+build/unihistext: src/unihistext src/unihistext.py src/unicode_blocks.py $(ADDDEPS)
 all:: build/unihistext
 build/uninormalize: src/uninormalize src/uninormalize.py $(ADDDEPS)
 all:: build/uninormalize

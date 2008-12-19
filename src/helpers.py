@@ -43,6 +43,15 @@ def safe_max(collection, fallback = 0):
 def safe_min(collection, fallback = int(2 ** 31 - 1)):
     return _safe_op(min, collection, fallback)
 
+def definition_file_xreadlines(path):
+    for line in open(path, 'rb').xreadlines():
+        try:
+            line = line.strip()
+            if not line or line[0] == '#': continue
+            yield line
+        except Exception:
+            import traceback; traceback.print_exc()
+
 def make_main(f):
     @wraps(f)
     def wrapper(*args, **kwargs):

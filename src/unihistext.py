@@ -22,6 +22,11 @@ def main():
     parser.add_option("-S", "--sequence-names-file", help="use file in format of NamedSequences.txt from Unicode instead of system default",
             default="/usr/share/unicode/NamedSequences.txt", metavar="FILE")
     parser.add_option("--only-combining", help="print only combining character sequences", default=False, action="store_true")
+    parser.add_option("-b", "--blocks", help="make statistics of Unicode blocks instead of separate code points", default=False, action="store_true")
+    parser.add_option("--blocks-definitions", help="read blocks definitions from FILE", metavar="FILE",
+            default="/usr/share/unicode/Blocks.txt")
+    parser.add_option("-B", "--filter-block", help="make statistics only for caracters in BLOCK_NAME as reported by --blocks; " + \
+            "block names are case insensitive (may be repeated)", metavar="BLOCK_NAME", action="append")
 
     run(*parser.parse_args())
     parser.destroy()
@@ -64,9 +69,30 @@ def glue_combinings(unichr, line, i):
             i += 1
     return unichr, line, i
 
+def make_block_abstracter(options):
+    import unicode_blocks
+    unicode_blocks.initialize(options.blocks_definitions, options)
+    return lambda unichr, line, i: (unicode_blocks.block(unichr), line, i)
+
+def make_block_filter(options):
+    import unicode_blocks
+    unicode_blocks.initialize(options.blocks_definitions, options)
+    names = [n.lower().strip() for n in options.filter_block]
+    return lambda unichr, line, i: (unicode_blocks.block(unichr).name.lower().strip() in names)
+
 def make_stats(input, options, args):
-    glue_combinings_ = lambda *args: args
+    if options.combining and options.blocks: die("You cannot use --combining and --blocks together.")
     if options.combining: glue_combinings_ = glue_combinings
+    else: glue_combinings_ = lambda *args: args
+
+    if options.blocks: abstract_block = make_block_abstracter(options)
+    else: abstract_block = lambda *args: args
+
+    def combine_filters(filt1, filt2):
+        return lambda *args: filt1(*args) and filt2(*args)
+
+    filter = lambda *args: True
+    if options.filter_block: filter = combine_filters(make_block_filter(options), filter)
 
     stats = {}
     for line in input:
@@ -76,8 +102,9 @@ def make_stats(input, options, args):
             off = i
             unichr = line[i]
             i += 1
+            if not filter(unichr, line, i): continue
             unichr, line, i = glue_combinings_(unichr, line, i)
-            # TODO any other glues?
+            unichr, line, i = abstract_block(unichr, line, i)
             stats[unichr] = stats.get(unichr, 0) + 1
     return stats
 
@@ -96,7 +123,7 @@ class Formatter(object):
     def filter(d, totals):
         return True
 
-class SimpleFmt(Formatter):
+class StatFmt(Formatter):
     @staticmethod
     def stat(stats, totals):
         totals['total_count'] = sum(d['count'] for d in stats)
@@ -124,22 +151,27 @@ class UnistrFmt(Formatter):
                 return f % ""
         return f % d['unistr']
 
+class BlockNameFmt(Formatter):
+    def __init__(self):
+        import unicode_blocks
+        assert unicode_blocks.isinitialized()
+        self.unicode_blocks = unicode_blocks
+
+    def fmt(self, d, totals):
+        return " %s " % d['unistr'].name
+
 class NameFmt(Formatter):
     mapping = {}
     def __init__(self, named_sequences_file = None):
         if named_sequences_file is not None:
             self.mapping = {}
-            for line in open(named_sequences_file).xreadlines():
+            for line in definition_file_xreadlines(named_sequences_file):
                 try:
-                    line = line.strip()
-                    if not line or line[0] == '#': continue
                     name, codes = line.split(";")
                     unistr = u"".join(unichr(int(codepoint, 16)) for codepoint in codes.split())
                     self.mapping[unistr] = name
                 except Exception:
-                    import traceback
-                    traceback.print_exc()
-                    pass
+                    import traceback; traceback.print_exc()
 
     def _name(self, unichr):
         try:
@@ -175,13 +207,16 @@ def print_hist(input, options, args):
     totals = {}
     stats = [ {'unistr': unistr, 'count': count } for (unistr, count) in stats ] # convert each entry to dict
 
-    # TODO construct fmts accoring to options
-    fmts = [SimpleFmt(), HexFmt(), UnistrFmt()]
+    fmts = [StatFmt()]
+    if not options.blocks: fmts.extend([HexFmt(), UnistrFmt()])
+    else: fmts.append(BlockNameFmt())
 
     if options.names:
+        if options.blocks: die("You cannot use --names and --blocks together.")
         fmts.append(NameFmt(options.sequence_names_file))
 
     if options.only_combining:
+        if options.blocks: die("You cannot use --only-combining and --blocks together.")
         fmts.append(OnlyCombiningFilter())
 
     for fmt in fmts:
