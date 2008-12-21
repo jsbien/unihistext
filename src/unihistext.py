@@ -202,6 +202,9 @@ class OnlyCombiningFilter(Formatter):
 def print_hist(input, options, args):
     stats = make_stats(input, options, args)
     stats = list(stats.iteritems())
+    if not stats:
+        print >> sys.stderr, "Empty input or all Unicode code points filtered out."
+        return
     second = lambda t: t[1]
     stats.sort(key = second, reverse=True) # sort by occurrances
     totals = {}
