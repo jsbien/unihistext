@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 __author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
 
@@ -6,7 +5,10 @@ import sys, os, os.path
 import unicodedata
 from itertools import imap
 import codecs
-from helpers import * 
+import operator
+
+from helpers import *
+import unicode_blocks
 
 @make_main
 def main():
@@ -15,18 +17,23 @@ def main():
     parser = OptionParser()
     parser.add_option("-i", "--input", dest="input", help="read Unicode stream from FILE ('-' means stdin, this is the default)", metavar="FILE", default="-")
     parser.add_option("-f", "--encoding", help="set input stream binary encoding ('utf-8' is the default)", default='utf-8')
-    parser.add_option("-l", "--list-encodings", help="list some available encodings and exit", default=False, action="store_true")
+    parser.add_option("-l", "--list-encodings", help="list available encodings and exit", default=False, action="store_true")
     parser.add_option("-V", "--version", help="print version and exit", default=False, action="store_true")
     parser.add_option("-c", "--combining", help="recognize combining character sequences", default=False, action="store_true")
     parser.add_option("-n", "--names", help="print names of Unicode characters or sequences", default=False, action="store_true")
     parser.add_option("-S", "--sequence-names-file", help="use file in format of NamedSequences.txt from Unicode instead of system default",
             default="/usr/share/unicode/NamedSequences.txt", metavar="FILE")
-    parser.add_option("--only-combining", help="print only combining character sequences", default=False, action="store_true")
+    parser.add_option("-C", "--only-combining", help="print only combining character sequences", default=False, action="store_true")
     parser.add_option("-b", "--blocks", help="make statistics of Unicode blocks instead of separate code points", default=False, action="store_true")
     parser.add_option("--blocks-definitions", help="read blocks definitions from FILE", metavar="FILE",
             default="/usr/share/unicode/Blocks.txt")
     parser.add_option("-B", "--filter-block", help="make statistics only for caracters in BLOCK_NAME as reported by --blocks; " + \
             "block names are case insensitive (may be repeated)", metavar="BLOCK_NAME", action="append")
+    parser.add_option("-s", "--sort",
+        help="sort statistics by METHOD which is 'block', 'code'" +
+            " or 'frequency' (default)",
+        choices=('block', 'code', 'frequency'), metavar="METHOD",
+        default='frequency')
 
     run(*parser.parse_args())
     parser.destroy()
@@ -49,7 +56,7 @@ def list_encodings():
                 sys.stdout.write(encs[pos].ljust(maxlen))
         sys.stdout.write("\n")
     print
-    print "Any encoding supported by Python's codecs module is suported."
+    print "Any encoding supported by Python's codecs module is supported."
     print "For a complete list of supported encodings"
     print "visit http://www.google.com/search?q=python+standard+encodings."
     print
@@ -70,20 +77,21 @@ def glue_combinings(unichr, line, i):
     return unichr, line, i
 
 def make_block_abstracter(options):
-    import unicode_blocks
     unicode_blocks.initialize(options.blocks_definitions, options)
     return lambda unichr, line, i: (unicode_blocks.block(unichr), line, i)
 
 def make_block_filter(options):
-    import unicode_blocks
     unicode_blocks.initialize(options.blocks_definitions, options)
     names = [n.lower().strip() for n in options.filter_block]
     return lambda unichr, line, i: (unicode_blocks.block(unichr).name.lower().strip() in names)
 
 def make_stats(input, options, args):
-    if options.combining and options.blocks: die("You cannot use --combining and --blocks together.")
-    if options.combining: glue_combinings_ = glue_combinings
-    else: glue_combinings_ = lambda *args: args
+    if options.combining and options.blocks:
+        die("You cannot use --combining and --blocks together.")
+    if options.combining:
+        glue_combinings_ = glue_combinings
+    else:
+        glue_combinings_ = lambda *args: args
 
     if options.blocks: abstract_block = make_block_abstracter(options)
     else: abstract_block = lambda *args: args
@@ -153,9 +161,7 @@ class UnistrFmt(Formatter):
 
 class BlockNameFmt(Formatter):
     def __init__(self):
-        import unicode_blocks
         assert unicode_blocks.isinitialized()
-        self.unicode_blocks = unicode_blocks
 
     def fmt(self, d, totals):
         return " %s " % d['unistr'].name
@@ -205,14 +211,31 @@ def print_hist(input, options, args):
     if not stats:
         print >> sys.stderr, "Empty input or all Unicode code points filtered out."
         return
-    second = lambda t: t[1]
-    stats.sort(key = second, reverse=True) # sort by occurrances
+    if options.sort == 'frequency':
+        stats.sort(key=operator.itemgetter(1), reverse=True) # sort by occurrences
+    elif options.sort == 'code':
+        if options.blocks:
+            die("You cannot use --blocks and --sort 'code' together.")
+        stats.sort(key=operator.itemgetter(0), reverse=False)
+    elif options.sort == 'block':
+        if options.blocks:
+            assert unicode_blocks.isinitialized()
+            stats.sort(key=lambda t: t[0].id, reverse=False)
+        elif options.combining:
+            die("You cannot use --combining and --sort 'block' together.")
+        else:
+            unicode_blocks.initialize(options.blocks_definitions, options)
+            stats.sort(key=lambda t: unicode_blocks.block(t[0]).id, reverse=False)
+    else:
+        die("Sorting method %r is not implemented" % options.sort)
     totals = {}
     stats = [ {'unistr': unistr, 'count': count } for (unistr, count) in stats ] # convert each entry to dict
 
     fmts = [StatFmt()]
-    if not options.blocks: fmts.extend([HexFmt(), UnistrFmt()])
-    else: fmts.append(BlockNameFmt())
+    if not options.blocks:
+        fmts.extend([HexFmt(), UnistrFmt()])
+    else:
+        fmts.append(BlockNameFmt())
 
     if options.names:
         if options.blocks: die("You cannot use --names and --blocks together.")

@@ -1,4 +1,6 @@
 
+__author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
+
 import os, sys, unicodedata, codecs, signal
 from functools import wraps
 import version
