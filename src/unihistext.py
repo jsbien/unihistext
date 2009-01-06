@@ -21,6 +21,9 @@ def main():
     parser.add_option("-V", "--version", help="print version and exit", default=False, action="store_true")
     parser.add_option("-c", "--combining", help="recognize combining character sequences", default=False, action="store_true")
     parser.add_option("-n", "--names", help="print names of Unicode characters or sequences", default=False, action="store_true")
+    parser.add_option("-N", "--block-names",
+        help="print names of blocks for Unicode characters",
+        default=False, action="store_true")
     parser.add_option("-S", "--sequence-names-file", help="use file in format of NamedSequences.txt from Unicode instead of system default",
             default="/usr/share/unicode/NamedSequences.txt", metavar="FILE")
     parser.add_option("-C", "--only-combining", help="print only combining character sequences", default=False, action="store_true")
@@ -199,6 +202,21 @@ class NameFmt(Formatter):
     def fmt(d, totals):
         return "%-*s" % (totals['max_name_len'] + 3, d['name'])
 
+class JustBlockNameFmt(Formatter):
+    def __init__(self, options):
+        Formatter.__init__(self)
+        unicode_blocks.initialize(options.blocks_definitions, options)
+    def prep(self, d, totals):
+        d['block_name'] = '';
+        if len(d['unistr']) == 1:
+            d['block_name'] = unicode_blocks.block(d['unistr']).name
+
+    def stat(self, stats, totals):
+        totals['max_block_name_len'] = safe_max(len(d['block_name']) for d in stats)
+
+    def fmt(self, d, totals):
+        return "%-*s" % (totals['max_block_name_len'] + 3, d['block_name'])
+
 class OnlyCombiningFilter(Formatter):
     def filter(self, d, totals):
         for unichr in d['unistr']:
@@ -238,8 +256,13 @@ def print_hist(input, options, args):
         fmts.append(BlockNameFmt())
 
     if options.names:
-        if options.blocks: die("You cannot use --names and --blocks together.")
+        if options.blocks:
+            die("You cannot use --names and --blocks together.")
         fmts.append(NameFmt(options.sequence_names_file))
+    if options.block_names:
+        if options.blocks:
+            die("You cannot use --block-names and --blocks together.")
+        fmts.append(JustBlockNameFmt(options))
 
     if options.only_combining:
         if options.blocks: die("You cannot use --only-combining and --blocks together.")
