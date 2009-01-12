@@ -12,6 +12,10 @@ all:: build/unihistext
 build/uninormalize: src/uninormalize src/uninormalize.py $(ADDDEPS)
 all:: build/uninormalize
 
+install:
+	install --group=root --owner=root \
+	    build/unihistext build/uninormalize $(DESTDIR)/usr/bin
+
 build/uninormalize build/unihistext:
 	mkdir -p `dirname $@`
 	./scripts/make-wrapper.sh $^ > $@

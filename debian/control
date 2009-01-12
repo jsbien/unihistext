@@ -1,0 +1,13 @@
+Source: unihistext
+Section: unknown
+Priority: extra
+Maintainer: Piotr Findeisen <piotr.findeisen@gmail.com>
+Build-Depends: debhelper (>= 5), bash, make, gzip, git-core, tar
+Standards-Version: 3.7.2
+
+Package: unihistext
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, python (>= 2.5), unicode-data, gzip, tar
+Description: More featurefull version of unihistext.
+ Created and maintained as a part of Warsaw University's
+ course.
