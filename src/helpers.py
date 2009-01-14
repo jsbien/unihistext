@@ -3,6 +3,8 @@ __author__ = "Piotr Findeisen <piotr.findeisen@gmail.com>"
 
 import os, sys, unicodedata, codecs, signal
 from functools import wraps
+import traceback
+
 import version
 
 def identity(x): return x
@@ -52,7 +54,7 @@ def definition_file_xreadlines(path):
             if not line or line[0] == '#': continue
             yield line
         except Exception:
-            import traceback; traceback.print_exc()
+            traceback.print_exc()
 
 def make_main(f):
     @wraps(f)
