@@ -16,6 +16,9 @@ install:
 	install --group=root --owner=root \
 	    build/unihistext build/uninormalize $(DESTDIR)/usr/bin
 
+deb:
+	debuild
+
 build/uninormalize build/unihistext:
 	mkdir -p `dirname $@`
 	./scripts/make-wrapper.sh $^ > $@
