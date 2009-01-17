@@ -1,5 +1,11 @@
+unihistext (0.9.3) unstable; urgency=low
+
+  * error reporting fixes
+
+ -- Piotr Findeisen <piotr.findeisen@gmail.com>  Sat, 17 Jan 2009 13:13:11 +0100
+
 unihistext (0.9.2) unstable; urgency=low
 
-  * Initial Release.
+  * Initial Debian Release.
 
  -- Piotr Findeisen <piotr.findeisen@gmail.com>  Thu, 08 Jan 2009 11:28:23 +0100
