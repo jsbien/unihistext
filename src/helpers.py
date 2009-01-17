@@ -24,13 +24,19 @@ def unicode_file(file, encoding = 'utf-8', errors = 'strict'):
 def unicode_xreadlines(input, *args, **kwargs):
     return iter(unicode_file(input, *args, **kwargs))
 
+def cannot_open(file):
+    die("%r cannot be opened" % (file,))
+
+def open_or_die(file, *args, **kwargs):
+    try:
+        return open(file, *args, **kwargs)
+    except Exception:
+        cannot_open(file)
+
 def open_input(options, **kwargs):
     input = sys.stdin
     if options.input != "-":
-        try:
-            input = open(options.input, 'rb')
-        except Exception:
-            die("%r cannot be opened" % options.input)
+        input = open_or_die(options.input)
     encoding = kwargs.get('encoding', getattr(options, 'encoding', None))
     if encoding is not None:
         input = unicode_file(input, encoding=encoding, **kwargs)
@@ -62,7 +68,7 @@ def safe_min(collection, fallback = int(2 ** 31 - 1)):
     return _safe_op(min, collection, fallback)
 
 def definition_file_xreadlines(path):
-    for line in open(path, 'rb').xreadlines():
+    for line in open_or_die(path, 'rb').xreadlines():
         try:
             line = line.strip()
             if not line or line[0] == '#': continue

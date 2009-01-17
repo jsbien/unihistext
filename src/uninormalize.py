@@ -37,7 +37,7 @@ def get_line_meat(line):
     return line.partition('#')[0].strip()
 
 def _make_post_rewritings(options, fixups, file, norm, encoding = 'utf-8'):
-    for lineno, line in enumerate(unicode_xreadlines(open(file, 'rb'), encoding=encoding)):
+    for lineno, line in enumerate(unicode_xreadlines(open_or_die(file, 'rb'), encoding=encoding)):
         line = get_line_meat(line)
         if not line: continue
         if len(line) > 1: die("more than one Unicode character in %r line %d: %r", file, lineno + 1, line)
