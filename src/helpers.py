@@ -32,8 +32,17 @@ def open_input(options, **kwargs):
     return input
 
 def die(fmt, *args):
-    print >> sys.stderr, "%s:" % os.path.basename(sys.argv[0]), fmt % args
+    progname = "%s:" % os.path.basename(sys.argv[0])
+    errorstr = fmt % args
+    try:
+        print >> sys.stderr, progname, errorstr
+    except Exception:
+        try:
+            print prognamem, errorstr
+        except Exception:
+            pass
     sys.exit(1)
+    raise SystemExit
 
 def _safe_op(op, collection, fallback):
     try:

@@ -90,7 +90,7 @@ def make_block_filter(options):
 
 def make_stats(input, options, args):
     if options.combining and options.blocks:
-        die("You cannot use --combining and --blocks together.")
+        die("you cannot use --combining and --blocks together")
     if options.combining:
         glue_combinings_ = glue_combinings
     else:
@@ -233,19 +233,19 @@ def print_hist(input, options, args):
         stats.sort(key=operator.itemgetter(1), reverse=True) # sort by occurrences
     elif options.sort == 'code':
         if options.blocks:
-            die("You cannot use --blocks and --sort 'code' together.")
+            die("you cannot use --blocks and --sort 'code' together")
         stats.sort(key=operator.itemgetter(0), reverse=False)
     elif options.sort == 'block':
         if options.blocks:
             assert unicode_blocks.isinitialized()
             stats.sort(key=lambda t: t[0].id, reverse=False)
         elif options.combining:
-            die("You cannot use --combining and --sort 'block' together.")
+            die("you cannot use --combining and --sort 'block' together")
         else:
             unicode_blocks.initialize(options.blocks_definitions, options)
             stats.sort(key=lambda t: unicode_blocks.block(t[0]).id, reverse=False)
     else:
-        die("Sorting method %r is not implemented" % options.sort)
+        die("sorting method %r is not implemented" % options.sort)
     totals = {}
     stats = [ {'unistr': unistr, 'count': count } for (unistr, count) in stats ] # convert each entry to dict
 
@@ -257,15 +257,15 @@ def print_hist(input, options, args):
 
     if options.names:
         if options.blocks:
-            die("You cannot use --names and --blocks together.")
+            die("you cannot use --names and --blocks together")
         fmts.append(NameFmt(options.sequence_names_file))
     if options.block_names:
         if options.blocks:
-            die("You cannot use --block-names and --blocks together.")
+            die("you cannot use --block-names and --blocks together")
         fmts.append(JustBlockNameFmt(options))
 
     if options.only_combining:
-        if options.blocks: die("You cannot use --only-combining and --blocks together.")
+        if options.blocks: die("you cannot use --only-combining and --blocks together")
         fmts.append(OnlyCombiningFilter())
 
     for fmt in fmts:
