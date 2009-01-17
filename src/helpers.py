@@ -25,7 +25,12 @@ def unicode_xreadlines(input, *args, **kwargs):
     return iter(unicode_file(input, *args, **kwargs))
 
 def open_input(options, **kwargs):
-    input = sys.stdin if options.input == "-" else open(options.input, 'rb')
+    input = sys.stdin
+    if options.input != "-":
+        try:
+            input = open(options.input, 'rb')
+        except Exception:
+            die("%r cannot be opened" % options.input)
     encoding = kwargs.get('encoding', getattr(options, 'encoding', None))
     if encoding is not None:
         input = unicode_file(input, encoding=encoding, **kwargs)
