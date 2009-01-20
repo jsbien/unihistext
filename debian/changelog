@@ -1,3 +1,9 @@
+unihistext (0.9.4) unstable; urgency=low
+
+  * maintenance release
+
+ -- Piotr Findeisen <piotr.findeisen@gmail.com> Tue, 20 Jan 2009 20:16:32 +0100
+
 unihistext (0.9.3) unstable; urgency=low
 
   * error reporting fixes
