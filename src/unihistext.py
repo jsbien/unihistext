@@ -67,16 +67,10 @@ def list_encodings():
 def is_combining(unichr, more_combinings = (unicodedata.lookup('zero width joiner'), unicodedata.lookup('zero width non-joiner'))):
     return unichr in more_combinings or unicodedata.combining(unichr) != 0
 
-def is_base(unichr):
-    if is_combining(unichr): return False
-    if unicodedata.category(unichr) in ('Cc', 'Cf', 'Zs', 'Zl', 'Zp'): return False
-    return True
-
 def glue_combinings(unichr, line, i):
-    if is_base(unichr) or is_combining(unichr):
-        while i != len(line) and is_combining(line[i]):
-            unichr += line[i]
-            i += 1
+    while i != len(line) and is_combining(line[i]):
+        unichr += line[i]
+        i += 1
     return unichr, line, i
 
 def make_block_abstracter(options):
@@ -193,7 +187,7 @@ class NameFmt(Formatter):
             d['name'] = self.mapping[d['unistr']]
             return
         d['name'] = ", ".join(filter(None, map(self._name, d['unistr'])))
-        if self.options.combining and not is_base(d['unistr'][0]) and is_combining(d['unistr']):
+        if self.options.combining and is_combining(d['unistr'][0]) and is_combining(d['unistr']):
             d['name'] = "<no base> " + d['name']
     @staticmethod
     def stat(stats, totals):
