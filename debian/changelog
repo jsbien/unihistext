@@ -1,3 +1,9 @@
+unihistext (0.9.6) unstable; urgency=low
+
+  * README update
+
+ -- Maciej Sokołowski (matemaciek) <matemaciek@gmail.com>  Thu, 12 Sep 2013 22:34:06 +0200
+
 unihistext (0.9.5) unstable; urgency=low
 
   * fix for issue with combining whitespace characters

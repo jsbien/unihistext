@@ -2,7 +2,10 @@ The Debian Package unihistext
 ----------------------------
 
 This package is a free software.
-Comments, bugs. patches, congratulations and pizzas send to
-Piotr Findeisen, <piotr.findeisen@gmail.com>.
 
- -- Piotr Findeisen <piotr.findeisen@gmail.com>  Thu, 08 Jan 2009 11:28:23 +0100
+Author: Piotr Findeisen, <piotr.findeisen@gmail.com>.
+Maintainer: Maciej Sokołowski, <matemaciek@gmail.com>.
+Project homepage: https://bitbucket.org/jsbien/unihistext
+Comments, bugs and patches can be reported at: https://bitbucket.org/jsbien/unihistext/issues
+
+ -- Maciej Sokołowski (matemaciek) <matemaciek@gmail.com>  Thu, 12 Sep 2013 22:34:06 +0200

@@ -1,7 +1,7 @@
 Source: unihistext
 Section: unknown
 Priority: extra
-Maintainer: Piotr Findeisen <piotr.findeisen@gmail.com>
+Maintainer: Maciej Sokołowski <matemaciek@gmail.com>
 Build-Depends: debhelper (>= 5), bash, make, gzip, git-core, tar
 Standards-Version: 3.7.2
 
