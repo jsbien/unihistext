@@ -1,0 +1,98 @@
+Janusz S. Bień - RTSK 08/09
+3.10.2008
+
+Zadanie laboratoryjne
+
+14. Temat wstępnie zarezerwowany przez p. Piotra Findeisena.
+
+Tworzenie histogramów dla tekstów w Unicodzie. Punkt wyjścia to
+uniutils:
+
+http://billposer.org/Software/unidesc.html
+http://packages.debian.org/lenny/uniutils
+https://launchpad.net/ubuntu/intrepid/+source/uniutils/2.25-3
+
+oraz zmiany wprowadzome na moją prośbę przez p. Piotra Malesę - patrz
+katalog tekstony.
+
+Wynik powinien mieć formę osobnego pakietu, np. uniutils-extension.
+
+Dla wszystkich podzadań należy przygotować i udostępnić dane testowe i
+przykładowe.
+
+I. unihist
+
+Dane wejściowe: UTF-8
+
+Należy umożliwić - za pomocą dodatkowych opcji w programie unihist lub
+za pomocą osobnych programów - robienie histogramów dla
+
+1. combining character sequences
+(http://www.unicode.org/glossary/#combining_character_sequence)
+
+Isolated combining characters
+(http://www.unicode.org/versions/Unicode5.0.0/ch03.pdf#G30602) należy
+wyraźnie oznaczać.
+
+Dodatkowa opcja powinna decydować o tym, czy uzwględniane są również
+znaki samodzielne, nie wchodzące w skład żadnej sekwencji.
+
+Dodatkowe opcje powinne pozwalać ma uwzględnianie informacji z plików
+
+NamedSequences.txt
+NamedSequencesProv.txt
+
+z pakietu unicode-data.
+
+Dodatkowa opcja powinna pozwalać za wskazanie własnego pliku o tej
+samej składni, który powinien "override" inne pliki.
+
+2. grapheme clusters
+(http://www.unicode.org/glossary/#grapheme_cluster)
+
+Do ustalania granic grapheme clusters w miarę możliwości należy
+stosować narzędzia projektu ICU:
+
+http://www.icu-project.org/
+
+http://packages.debian.org/search?searchon=sourcenames&keywords=icu
+
+(aktualna wersja tylko w experimental).
+
+3. tekstonów
+
+Nieformalnie tekstony opisujemy jako elementy --- znaki samodzielne i
+combining character sequences --- tekstu w postaci NFKC
+(Normalization Form KC - compatibility decomposition, canonical
+composition).
+
+Może się okazać, że compatibility decomposition rozkłada znaki, które
+chciałbym traktować jako jeden tekston. Wtedy będzie trzeba blokować
+dekompozycję znaków opisanych w specjalnym pliku w formacie wzorowanym
+na innych plikach standardu Unicode.
+
+Analogicznie może się okazać, że canonical compatibility składa znaki,
+które chciałbym traktować jako osobne tekstony. Wtedy będzie trzeba
+blokować składanie znaków, również opisanych w specjalnym pliku w
+formacie wzorowanym na innych plikach standardu Unicode.
+
+W konsekwencji należy zaprogramować obsługę takich plików, w miarę
+możliwości stosując narzędzia projektu ICU.
+
+II. unidesc
+
+Dane wejściowe: UTF-8 
+
+Działanie programu należy uogólnić na dwa sposoby:
+
+1. Histogramy przynależności do bloków zamiast podawania offsetów znaków.
+
+2. Histogramy dla innych własności znaków niż tylko przynależność do
+bloku. Repertuar obsługiwanych własności może być arbitralnie
+ograniczony ze względów technicznych.
+
+$Id: tekstony.txt,v 1.6 2008/10/03 08:44:47 jsbien Exp jsbien $
+
+%%% Local Variables: 
+%%% coding: utf-8-unix
+%%% End: 
