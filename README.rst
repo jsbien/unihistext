@@ -9,4 +9,6 @@ A correction by Maciej Sokołowski.
 
 Cf. http://unicode.org/mail-arch/unicode-ml/y2012-m12/0069.html
 
-A sample named sequences file is available at https://bitbucket.org/jsbien/unicode4polish/.
+The MUFI names file and a sample output are available in the example
+directory.  Another sample named sequences file is available at
+https://bitbucket.org/jsbien/unicode4polish/.
