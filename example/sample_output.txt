@@ -1,0 +1,38 @@
+unihistext -c -n -S MUFI_4.0-names.txt  -i sample_text.txt 
+  12.918       58                 0x000020  	 	SPACE
+  11.359       51                 0x000069  	i	LATIN SMALL LETTER I
+   8.241       37                 0x000073  	s	LATIN SMALL LETTER S
+   7.795       35                 0x000065  	e	LATIN SMALL LETTER E
+   7.572       34                 0x000075  	u	LATIN SMALL LETTER U
+   7.350       33                 0x000074  	t	LATIN SMALL LETTER T
+   5.345       24                 0x000061  	a	LATIN SMALL LETTER A
+   4.900       22                 0x000072  	r	LATIN SMALL LETTER R
+   4.232       19                 0x00006E  	n	LATIN SMALL LETTER N
+   4.009       18                 0x000063  	c	LATIN SMALL LETTER C
+   3.563       16                 0x00006F  	o	LATIN SMALL LETTER O
+   3.341       15                 0x00002C  	,	COMMA
+   3.341       15                 0x00006C  	l	LATIN SMALL LETTER L
+   2.450       11                 0x000070  	p	LATIN SMALL LETTER P
+   2.004        9                 0x00006D  	m	LATIN SMALL LETTER M
+   1.782        8                 0x000064  	d	LATIN SMALL LETTER D
+   1.559        7                 0x00000A  		LINE FEED (LF)
+   1.559        7                 0x000071  	q	LATIN SMALL LETTER Q
+   1.336        6                 0x000062  	b	LATIN SMALL LETTER B
+   0.668        3                 0x000076  	v	LATIN SMALL LETTER V
+   0.445        2                 0x0000A0  	 	NO-BREAK SPACE
+   0.445        2                 0x00004C  	L	LATIN CAPITAL LETTER L
+   0.445        2                 0x000050  	P	LATIN CAPITAL LETTER P
+   0.445        2                 0x000068  	h	LATIN SMALL LETTER H
+   0.223        1        0x00A76F 0x000303  	ꝯ̃	LATIN SMALL LETTER CON, COMBINING TILDE
+   0.223        1        0x00204A 0x000335  	⁊̵	TIRONIAN SIGN ET, COMBINING SHORT STROKE OVERLAY
+   0.223        1                 0x00F153  		COMBINING ABBREVIATION MARK SUPERSCRIPT UR ROUND R FORM [MUFI]
+   0.223        1                 0x00A76F  	ꝯ	LATIN SMALL LETTER CON
+   0.223        1                 0x00002E  	.	FULL STOP
+   0.223        1                 0x00003A  	:	COLON
+   0.223        1                 0x000048  	H	LATIN CAPITAL LETTER H
+   0.223        1                 0x000053  	S	LATIN CAPITAL LETTER S
+   0.223        1                 0x000066  	f	LATIN SMALL LETTER F
+   0.223        1                 0x00006B  	k	LATIN SMALL LETTER K
+   0.223        1                 0x00007A  	z	LATIN SMALL LETTER Z
+   0.223        1                 0x00A76B  	ꝫ	LATIN SMALL LETTER ET
+   0.223        1                 0x00017F  	ſ	LATIN SMALL LETTER LONG S
